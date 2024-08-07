@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taylor Swift Album Ranker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            background: linear-gradient(135deg, #ffd700, #ff69b4);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50% }
+            50% { background-position: 100% 50% }
+            100% { background-position: 0% 50% }
+        }
+        h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-top: 40px;
+            margin-bottom: 60px;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            width: 200px;
+            min-height: 100px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s, opacity 0.3s;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+            word-wrap: break-word;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        #result {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+            margin-top: 40px;
+        }
+        #confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .checkmark {
+            color: #4CAF50;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .cross {
+            color: #F44336;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+                margin-bottom: 40px;
+            }
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .card {
+                width: 80%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>TAYLOR SWIFT ALBUM RANKER</h1>
+    <div class="container" id="cardContainer">
+        <div class="card" id="card1"></div>
+        <div class="card" id="card2"></div>
+    </div>
+    <div id="result"></div>
+    <canvas id="confetti"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        const albums = [
+            "Taylor Swift",
+            "Fearless (Taylor's Version)",
+            "Speak Now (Taylor's Version)",
+            "Red (Taylor's Version)",
+            "1989 (Taylor's Version)",
+            "Reputation",
+            "Lover",
+            "Folklore",
+            "Evermore",
+            "Midnights"
+        ];
+
+        let rankings = {};
+        let comparisons = 0;
+        const totalComparisons = albums.length * (albums.length - 1) / 2;
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function updateCards() {
+            if (comparisons >= totalComparisons) {
+                showResults();
+                return;
+            }
+
+            shuffleArray(albums);
+            document.getElementById('card1').innerHTML = albums[0];
+            document.getElementById('card2').innerHTML = albums[1];
+            document.getElementById('card1').style.transform = 'scale(1)';
+            document.getElementById('card2').style.transform = 'scale(1)';
+            document.getElementById('card1').style.opacity = '1';
+            document.getElementById('card2').style.opacity = '1';
+        }
+
+        function selectAlbum(selected, other, selectedCard, otherCard) {
+            if (!rankings[selected]) rankings[selected] = 0;
+            if (!rankings[other]) rankings[other] = 0;
+            rankings[selected]++;
+            comparisons++;
+
+            const selectedFeedback = document.createElement('div');
+            selectedFeedback.className = 'feedback checkmark';
+            selectedFeedback.textContent = '✓';
+            selectedCard.appendChild(selectedFeedback);
+
+            const otherFeedback = document.createElement('div');
+            otherFeedback.className = 'feedback cross';
+            otherFeedback.textContent = '✗';
+            otherCard.appendChild(otherFeedback);
+
+            setTimeout(() => {
+                selectedFeedback.style.opacity = '1';
+                otherFeedback.style.opacity = '1';
+            }, 50);
+
+            setTimeout(() => {
+                selectedCard.style.transform = 'scale(1.1)';
+                otherCard.style.transform = 'scale(0.9)';
+            }, 300);
+
+            setTimeout(() => {
+                selectedCard.style.opacity = '0';
+                otherCard.style.opacity = '0';
+            }, 600);
+
+            setTimeout(() => {
+                selectedCard.removeChild(selectedFeedback);
+                otherCard.removeChild(otherFeedback);
+                updateCards();
+            }, 900);
+
+            // Shift gradient
+            document.body.style.animationDelay = `-${(comparisons / totalComparisons) * 15}s`;
+        }
+
+        function showResults() {
+            const sortedAlbums = Object.keys(rankings).sort((a, b) => rankings[b] - rankings[a]);
+            let resultHTML = "<h2>Your Taylor Swift Album Ranking:</h2><ol>";
+            sortedAlbums.forEach(album => {
+                resultHTML += `<li>${album}</li>`;
+            });
+            resultHTML += "</ol>";
+            document.getElementById('result').innerHTML = resultHTML;
+            document.getElementById('cardContainer').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            startConfetti();
+        }
+
+        function startConfetti() {
+            const duration = 3 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        document.getElementById('card1').addEventListener('click', () => selectAlbum(albums[0], albums[1], document.getElementById('card1'), document.getElementById('card2')));
+        document.getElementById('card2').addEventListener('click', () => selectAlbum(albums[1], albums[0], document.getElementById('card2'), document.getElementById('card1')));
+
+        updateCards();
+    </script>
+</body>
+</html>

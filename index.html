@@ -30,17 +30,22 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             margin-top: 40px;
             margin-bottom: 60px;
+            text-align: center;
+            padding: 0 20px;
         }
         .container {
             display: flex;
             gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0 20px;
         }
         .card {
             background-color: white;
             border-radius: 10px;
             padding: 20px;
             width: 200px;
-            height: 100px;
+            min-height: 100px;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             cursor: pointer;
@@ -49,6 +54,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+            word-wrap: break-word;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -57,7 +65,8 @@
             background-color: white;
             border-radius: 10px;
             padding: 20px;
-            width: 300px;
+            width: 80%;
+            max-width: 300px;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             display: none;
@@ -77,9 +86,10 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 80px;
+            font-size: 60px;
             opacity: 0;
             transition: opacity 0.3s;
+            pointer-events: none;
         }
         .checkmark {
             color: #4CAF50;
@@ -88,6 +98,21 @@
         .cross {
             color: #F44336;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+                margin-bottom: 40px;
+            }
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .card {
+                width: 80%;
+                max-width: 250px;
+            }
         }
     </style>
 </head>
@@ -147,11 +172,20 @@
             rankings[selected]++;
             comparisons++;
 
-            selectedCard.innerHTML += '<span class="feedback checkmark">✓</span>';
-            otherCard.innerHTML += '<span class="feedback cross">✗</span>';
+            const selectedFeedback = document.createElement('div');
+            selectedFeedback.className = 'feedback checkmark';
+            selectedFeedback.textContent = '✓';
+            selectedCard.appendChild(selectedFeedback);
 
-            selectedCard.querySelector('.feedback').style.opacity = '1';
-            otherCard.querySelector('.feedback').style.opacity = '1';
+            const otherFeedback = document.createElement('div');
+            otherFeedback.className = 'feedback cross';
+            otherFeedback.textContent = '✗';
+            otherCard.appendChild(otherFeedback);
+
+            setTimeout(() => {
+                selectedFeedback.style.opacity = '1';
+                otherFeedback.style.opacity = '1';
+            }, 50);
 
             setTimeout(() => {
                 selectedCard.style.transform = 'scale(1.1)';
@@ -163,7 +197,11 @@
                 otherCard.style.opacity = '0';
             }, 600);
 
-            setTimeout(updateCards, 900);
+            setTimeout(() => {
+                selectedCard.removeChild(selectedFeedback);
+                otherCard.removeChild(otherFeedback);
+                updateCards();
+            }, 900);
 
             // Shift gradient
             document.body.style.animationDelay = `-${(comparisons / totalComparisons) * 15}s`;

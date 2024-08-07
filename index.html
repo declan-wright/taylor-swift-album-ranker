@@ -32,6 +32,7 @@
             margin-bottom: 60px;
             text-align: center;
             padding: 0 20px;
+            line-height: 1.2;
         }
         .container {
             display: flex;
@@ -45,7 +46,7 @@
             border-radius: 10px;
             padding: 20px;
             width: 200px;
-            min-height: 100px;
+            height: 100px;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             cursor: pointer;
@@ -57,6 +58,7 @@
             margin-bottom: 20px;
             font-size: 16px;
             word-wrap: break-word;
+            overflow: hidden;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -90,6 +92,7 @@
             opacity: 0;
             transition: opacity 0.3s;
             pointer-events: none;
+            z-index: 10;
         }
         .checkmark {
             color: #4CAF50;
@@ -98,6 +101,10 @@
         .cross {
             color: #F44336;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .card-content {
+            position: relative;
+            z-index: 1;
         }
 
         @media (max-width: 600px) {
@@ -112,15 +119,17 @@
             .card {
                 width: 80%;
                 max-width: 250px;
+                height: 80px;
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
-    <h1>TAYLOR SWIFT ALBUM RANKER</h1>
+    <h1>TAYLOR SWIFT<br>ALBUM RANKER</h1>
     <div class="container" id="cardContainer">
-        <div class="card" id="card1"></div>
-        <div class="card" id="card2"></div>
+        <div class="card" id="card1"><div class="card-content"></div></div>
+        <div class="card" id="card2"><div class="card-content"></div></div>
     </div>
     <div id="result"></div>
     <canvas id="confetti"></canvas>
@@ -158,8 +167,8 @@
             }
 
             shuffleArray(albums);
-            document.getElementById('card1').innerHTML = albums[0];
-            document.getElementById('card2').innerHTML = albums[1];
+            document.querySelector('#card1 .card-content').innerHTML = albums[0];
+            document.querySelector('#card2 .card-content').innerHTML = albums[1];
             document.getElementById('card1').style.transform = 'scale(1)';
             document.getElementById('card2').style.transform = 'scale(1)';
             document.getElementById('card1').style.opacity = '1';
